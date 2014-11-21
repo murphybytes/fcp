@@ -2,16 +2,22 @@ package main
 
 import (
   "fmt"
-  "os"
-  "github.com/gaal/go-options/options"
+  "flag"
   )
 
+  type Arguments struct {
+    deamonize *bool
+    server    *bool
+
+  }
+
   func main() {
-    s := options.NewOptions(`
-      fcp - Fast secure file copy
-      --
-      x,xcite   Exciting option
-      `)
-    opt := s.Parse(os.Args[1:])
-    fmt.Println( opt )
+
+    arguments := new(Arguments)
+    arguments.deamonize = flag.Bool("d", false, "Run server as a daemon")
+    arguments.server    = flag.Bool("s", false, "Run server in foreground")
+    
+    flag.Parse()
+
+    fmt.Println( *arguments.deamonize )
   }
