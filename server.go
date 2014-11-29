@@ -2,15 +2,15 @@ package main
 
 import (
   "fmt"
-  )
+)
 
-func server( inchan <-chan bool, outchan chan<- bool ) {
+func server( inChan <-chan bool, outChan chan<- bool, ctxt *Context ) {
 
   for run := true; run == true; {
-      fmt.Println( "running")
+      //fmt.Println( "running")
 
       select {
-        case <-inchan :
+        case <-inChan :
           run = false
         default:
       }
@@ -18,6 +18,6 @@ func server( inchan <-chan bool, outchan chan<- bool ) {
   }
 
   fmt.Println("quitting")
-  outchan <- true
+  outChan <- true
 
 }
