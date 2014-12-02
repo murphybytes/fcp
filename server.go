@@ -7,7 +7,6 @@ import (
 func server( inChan <-chan bool, outChan chan<- bool, ctxt *Context ) {
 
   for run := true; run == true; {
-      //fmt.Println( "running")
 
       select {
         case <-inChan :

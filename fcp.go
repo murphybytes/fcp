@@ -11,8 +11,6 @@ import (
 func main() {
 	
 	ctx := NewContext()
-
-
 	flag.Parse()
 
 	if  *ctx.arguments.server {

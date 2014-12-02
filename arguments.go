@@ -22,7 +22,7 @@ func NewArguments()( *Arguments ) {
 
 
 	return &Arguments{
-		flag.Bool("s", false, "Run server in foreground"),
+		flag.Bool("s", false, "Run in server mode"),
 		flag.Bool("v", false, "Verbose log messages"),
 		flag.Bool("n", false, "Disable encryption"),
 	}
