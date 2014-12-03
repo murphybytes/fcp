@@ -14,6 +14,8 @@ func main() {
 	flag.Parse()
 
 	if  *ctx.arguments.server {
+		// create pid if user wants it
+		ctx.CreatePidFile()
 		signalChannel := make(chan os.Signal, 1)
 		signal.Notify( signalChannel, os.Kill, os.Interrupt )
 
@@ -30,6 +32,8 @@ func main() {
 		inChan<- true
 		// block until it stops
 		<-replyChan
+		// get rid of pid file if one was created
+		ctx.RemovePidFile()
 		ctx.LogInfo("Server stopped, exiting...")
 
 
