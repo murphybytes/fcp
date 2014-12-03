@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"time"
 )
 
-func server( inChan <-chan bool, outChan chan<- bool, ctxt *Context ) {
+func server( inChan <-chan bool, outChan chan<- bool, ctx *Context ) {
 
 	for run := true; run == true; {
 
@@ -12,11 +12,14 @@ func server( inChan <-chan bool, outChan chan<- bool, ctxt *Context ) {
 		case <-inChan :
 			run = false
 		default:
+			var duration time.Duration			
+			duration = 100 * time.Millisecond
+			time.Sleep(duration)
 		}
 
 	}
 
-	fmt.Println("quitting")
+	ctx.LogDebug( "Exiting server loop")
 	outChan <- true
 
 }
