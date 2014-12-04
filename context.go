@@ -49,6 +49,7 @@ func (ctx *Context ) LogError( v ...interface{} ) {
 
 // logs message and terminates application
 func (ctx *Context ) LogFatal( v ...interface{} ) {
+	ctx.RemovePidFile()
 	ctx.fatalLog.Fatalln( v... )
 }
 
