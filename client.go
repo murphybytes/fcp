@@ -1,5 +1,8 @@
 package main
 
+import (
+	"github.com/murphybytes/tufer"
+)
 
 type Client struct {
 	ctx *Context
