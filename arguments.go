@@ -13,6 +13,7 @@ type Arguments struct {
 	pidDir          *string
 	listenPort      *int
 	listenHost      *string
+	fileArgs        []string
 
 }
 
@@ -32,9 +33,12 @@ func NewArguments()( *Arguments ) {
 		flag.String("pid-file", "", "Path where pid file will be stored"),
 		flag.Int( "listen-port", 8069, "Listen port server uses for incoming connections" ),
 		flag.String("listen-host", "localhost", "Host name for server" ),
+		nil,
 	}
 }
 
 func ( args *Arguments ) GetServerService( ) ( string ) {
 	return *args.listenHost + ":" + strconv.Itoa( *args.listenPort )
 }
+
+

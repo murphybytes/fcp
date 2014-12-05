@@ -40,12 +40,22 @@ func main() {
 	} else {
 		// if we are here we are in interactive mode, look for file source and
 		// destination as last two arguments
-		fileArgs := flag.Args()
+		ctx.arguments.fileArgs = flag.Args() 
 	
-		if len(fileArgs) != 2 {
+		if len(ctx.arguments.fileArgs) != 2 {
 			flag.Usage()
 			os.Exit( ERROR_IMPROPER_USAGE )
 		}
+
+		client, err := NewClient( ctx )
+		
+		if err != nil {
+			ctx.LogFatal( "Client shut down with error:", err )
+		}
+
+		client.Execute()
+
+		
 	}
 
 
