@@ -1,5 +1,18 @@
 package main
 
+import (
+	"regexp"
+	"os/user"
+	"os"
+	"errors"
+)
+
+type FileInformation struct {
+	userName string 
+	hostName string
+	fileName string
+}
+
 type ClientCommandParser struct {
 	ctx *Context
 }
@@ -9,5 +22,79 @@ func NewClientCommandParser( ctx *Context )( *ClientCommandParser, error ) {
 	return &ClientCommandParser{ ctx }, nil
 }
 
-func (p *ClientCommandParser) Parse() ( source *ClientCommand, dest *ClientCommand, error ) {
+func (p *ClientCommandParser) Parse() ( source *FileInformation, dest *FileInformation, err error ) {
+	
+	return 
 }
+
+func (p *ClientCommandParser) ParseWithUserAndHost( command string )( info *FileInformation, err error ) {
+	info = new(FileInformation)
+	userExpr := regexp.MustCompile( `^[a-zA-Z0-9._-]+@`)
+	loc := userExpr.FindStringIndex( command )
+
+	if loc != nil {
+		info.userName = command[0:(loc[1]-1)]
+		command = command[loc[1]:]
+	} else {
+		user, e := user.Current() 
+		if e != nil {
+			return nil, e 
+		}
+		info.userName = user.Username
+	}
+
+	hostExpr := regexp.MustCompile( `^[a-zA-Z0-9._-]+:` )
+	loc = hostExpr.FindStringIndex( command )
+
+	if loc == nil {
+		return nil, errors.New( "Invalid file specification" )
+	}
+
+	info.hostName = command[0:loc[1]-1]
+	info.fileName = command[loc[1]:]
+	return 
+}
+
+func (p* ClientCommandParser) ParseWithoutUserAndHost( command string)( info *FileInformation, err error ) {
+
+	expr := regexp.MustCompile( `^[\/a-zA-Z0-9_-]+$` )
+	loc := expr.FindStringIndex( command )
+
+	if loc == nil {
+		return nil, errors.New( "Invalid file specification" )
+	}
+
+	info = new(FileInformation)
+	user, e := user.Current()
+
+	if e != nil {
+		return nil, e
+	}
+
+	info.userName = user.Username
+	info.hostName, err = os.Hostname()
+
+	if err != nil {
+		return nil, err
+	}
+
+	info.fileName = command 
+
+	return 	
+}
+
+func (p *ClientCommandParser) ParseFileInformation( command string )( info *FileInformation, err error ) {
+	info = new(FileInformation)
+	expr := regexp.MustCompile( `^[a-z0-9A-Z._-]+@?[a-z0-9A-Z._-]+:[\/a-z0-9A-Z._-]+$`)
+	loc := expr.FindStringIndex( command )
+
+	if loc == nil {
+		return p.ParseWithoutUserAndHost( command )
+	} 
+
+	return p.ParseWithUserAndHost( command ) 
+
+
+}
+
+
