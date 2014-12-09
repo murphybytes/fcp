@@ -11,12 +11,18 @@ type FileInformation struct {
 	userName string 
 	hostName string
 	fileName string
+	// signals we will be reading or
+	// writing to a file on local filesystem
+	local    bool 
 }
 
 type ClientCommandParser struct {
 	ctx *Context
 }
 
+func NewFileInformation( )( *FileInformation, error ) {
+	return &FileInformation{ "", "", "", false }, nil
+}
 
 func NewClientCommandParser( ctx *Context )( *ClientCommandParser, error ) {
 	return &ClientCommandParser{ ctx }, nil
@@ -44,7 +50,7 @@ func (p *ClientCommandParser) Parse() ( source *FileInformation, dest *FileInfor
 }
 
 func (p *ClientCommandParser) ParseWithUserAndHost( command string )( info *FileInformation, err error ) {
-	info = new(FileInformation)
+	info, _ = NewFileInformation()
 	userExpr := regexp.MustCompile( `^[a-zA-Z0-9._-]+@`)
 	loc := userExpr.FindStringIndex( command )
 
@@ -80,7 +86,7 @@ func (p* ClientCommandParser) ParseWithoutUserAndHost( command string)( info *Fi
 		return nil, errors.New( "Invalid file specification" )
 	}
 
-	info = new(FileInformation)
+	info, _ = NewFileInformation() 
 	user, e := user.Current()
 
 	if e != nil {
@@ -89,6 +95,8 @@ func (p* ClientCommandParser) ParseWithoutUserAndHost( command string)( info *Fi
 
 	info.userName = user.Username
 	info.hostName, err = os.Hostname()
+	
+	info.local = true
 
 	if err != nil {
 		return nil, err
