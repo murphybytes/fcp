@@ -15,6 +15,45 @@ func TestNewClientCommand( t *testing.T ) {
 	}
 }
 
+func TestParse( t *testing.T ) {
+	context := new(Context)
+	context.arguments = new(Arguments)
+	parser, _ := NewClientCommandParser( context )
+
+	source, dest, err := parser.Parse()
+
+	if source == nil && dest == nil && err != nil {
+		t.Log( `Parse command passed, returning error '`, err, `'when arguments are incorrect` )
+	} else {
+		t.Error( "Did not get expected error from Parse command" )
+	}
+
+	var args [2]string
+	context.arguments.fileArgs = args[0:2]
+	context.arguments.fileArgs[0] = "sourcefile"
+	context.arguments.fileArgs[1] = "abc@foo.com:/dest/file"
+
+	source, dest, err = parser.Parse()
+	
+	if err != nil {
+		t.Error( "Expected nil error, got", err )
+	}
+
+	if source.fileName != "sourcefile" {
+		t.Error( `File field expected 'sourcefile' got`, source.fileName ) 
+	}
+
+	if dest.userName == "abc" && dest.hostName == "foo.com" && 
+		dest.fileName == "/dest/file" && err == nil {
+		t.Log( "Parse command successfully return dest", dest )
+	} else {
+		t.Error( "Parse command failed unexpected dest", dest )
+	}
+
+	
+
+}
+
 func TestParseFileInformation( t *testing.T ) {
 	context := new(Context)
 	parser, _ := NewClientCommandParser( context )

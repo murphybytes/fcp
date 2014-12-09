@@ -23,7 +23,23 @@ func NewClientCommandParser( ctx *Context )( *ClientCommandParser, error ) {
 }
 
 func (p *ClientCommandParser) Parse() ( source *FileInformation, dest *FileInformation, err error ) {
-	
+	if len( p.ctx.arguments.fileArgs ) != 2 {
+		err = errors.New( `File source and/or destination arguments are missing` )
+		return
+	}
+
+	source, err = p.ParseFileInformation( p.ctx.arguments.fileArgs[0] )
+
+	if err != nil {
+		return
+	}
+
+	dest, err = p.ParseFileInformation( p.ctx.arguments.fileArgs[1] )
+
+	if err != nil {
+		return nil, nil, err
+	}
+
 	return 
 }
 
