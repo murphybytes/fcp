@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"strconv"
 )
 
 type Arguments struct {
@@ -11,7 +10,7 @@ type Arguments struct {
 	verbose         *bool
 	noEncrypt       *bool
 	pidDir          *string
-	listenPort      *int
+	port            *int
 	listenHost      *string
 	fileArgs        []string
 
@@ -31,14 +30,14 @@ func NewArguments()( *Arguments ) {
 		flag.Bool("v", false, "Verbose log messages"),
 		flag.Bool("n", false, "Disable encryption"),
 		flag.String("pid-file", "", "Path where pid file will be stored"),
-		flag.Int( "listen-port", 8069, "Listen port server uses for incoming connections" ),
+		flag.Int( "p", 8069, "Port used for tcp connections." ),
 		flag.String("listen-host", "localhost", "Host name for server" ),
 		nil,
 	}
 }
 
 func ( args *Arguments ) GetServerService( ) ( string ) {
-	return *args.listenHost + ":" + strconv.Itoa( *args.listenPort )
+	return fmt.Sprintf( ":%d", *args.port )
 }
 
 

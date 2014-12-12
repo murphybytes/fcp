@@ -1,3 +1,9 @@
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// This file contains code used to parse file,  host and user information from source
+// and destination command line arguments.  
+//
+////////////////////////////////////////////////////////////////////////////////////////////////
 package main
 
 import (
@@ -11,9 +17,7 @@ type FileInformation struct {
 	userName string 
 	hostName string
 	fileName string
-	// signals we will be reading or
-	// writing to a file on local filesystem
-	local    bool 
+	isLocalFile    bool 
 }
 
 type ClientCommandParser struct {
@@ -28,6 +32,7 @@ func NewClientCommandParser( ctx *Context )( *ClientCommandParser, error ) {
 	return &ClientCommandParser{ ctx }, nil
 }
 
+
 func (p *ClientCommandParser) Parse() ( source *FileInformation, dest *FileInformation, err error ) {
 	if len( p.ctx.arguments.fileArgs ) != 2 {
 		err = errors.New( `File source and/or destination arguments are missing` )
@@ -40,6 +45,7 @@ func (p *ClientCommandParser) Parse() ( source *FileInformation, dest *FileInfor
 		return
 	}
 
+	source.isLocalFile = true
 	dest, err = p.ParseFileInformation( p.ctx.arguments.fileArgs[1] )
 
 	if err != nil {
@@ -96,8 +102,6 @@ func (p* ClientCommandParser) ParseWithoutUserAndHost( command string)( info *Fi
 	info.userName = user.Username
 	info.hostName, err = os.Hostname()
 	
-	info.local = true
-
 	if err != nil {
 		return nil, err
 	}
