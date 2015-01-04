@@ -68,8 +68,8 @@ func HandleConnection( conn *tufer.Connection, ctx *Context ) {
 
 func Handshake(conn *tufer.Connection, ctx *Context)( err error ) {
 
-	//conn.SetDeadline(5)
-	//defer conn.ClearDeadline()
+	conn.SetDeadline(5)
+	defer conn.ClearDeadline()
 
 	// send id to client
 	err = conn.WriteControlMessages(INITIAL_SERVER_ID, SERVER_CONTROL_PROTOCOL_VERSION)
