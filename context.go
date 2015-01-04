@@ -62,7 +62,7 @@ func (ctx *Context) CreatePidFile() {
 			buff := []byte( strconv.Itoa( os.Getpid() ) )
 
 			ioutil.WriteFile( pidPath, buff, 0644 )
-		} else { 
+		} else {
 			ctx.LogFatal( "PID file exists, fcp server is either running or crashed unexpectantly.")
 		}
 
@@ -76,11 +76,11 @@ func (ctx *Context) RemovePidFile() {
 		pidPath := *ctx.arguments.pidDir + "/fcp.pid"
 		ctx.LogInfo( "Removing Pidfile:", pidPath )
 		err := os.Remove( pidPath )
-		
-		if err != nil { 
+
+		if err != nil {
 			ctx.LogWarn( "Error occurred while removing pid file: ", err )
 		}
-		
+
 	}
-	
+
 }

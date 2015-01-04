@@ -5,40 +5,90 @@ import (
 	"github.com/murphybytes/tufer"
 )
 
-func server( inChan <-chan bool, outChan chan<- bool, ctx *Context ) {
+func RunServer( c chan int, ctx *Context ) {
 
-	go listen( ctx )
+	go Listen( ctx )
 
-	for run := true; run == true; {
+WaitLoop:
+	for  {
 
 		select {
-		case <-inChan :
-			run = false
+		case <-c :
+			break WaitLoop
 		default:
-			var duration time.Duration			
-			duration = 100 * time.Millisecond
+			duration := 100 * time.Millisecond
 			time.Sleep(duration)
 		}
 
 	}
 
 	ctx.LogDebug( "Exiting server loop")
-	outChan <- true
+	c <- 1
 
 }
 
 
-func listen( ctx *Context ) {
+func Listen( ctx *Context ) {
 
 	ctx.LogDebug( "Started listener routine" )
-	listener, err := tufer.NewListener( ctx.arguments.GetServerService() )
+	listener, err := tufer.NewListener( ctx.arguments.GetServerService(), ctx )
 
 	if err != nil {
 		ctx.LogFatal( "Error creating listener socket. Error:", err )
 	}
 
-	_, err = listener.Accept()
+	defer listener.Close()
 
-	ctx.LogDebug( "Accept returned:", err )
-	
+	for {
+		connection, err := listener.Accept()
+
+		if err != nil {
+			ctx.LogWarn( "Accept returned:", err )
+		} else {
+			go HandleConnection( connection, ctx)
+			ctx.LogDebug("Accept Success")
+		}
+
+	}
+
+	ctx.LogDebug( "listen routine exits")
+
+}
+
+func HandleConnection( conn *tufer.Connection, ctx *Context ) {
+	defer conn.Close()
+	ctx.LogDebug("Handle Connection")
+	err := Handshake(conn, ctx)
+
+	if err != nil {
+		ctx.LogWarn( "Handshake failed:", err)
+	}
+
+}
+
+func Handshake(conn *tufer.Connection, ctx *Context)( err error ) {
+
+	//conn.SetDeadline(5)
+	//defer conn.ClearDeadline()
+
+	// send id to client
+	err = conn.WriteControlMessages(INITIAL_SERVER_ID, SERVER_CONTROL_PROTOCOL_VERSION)
+
+
+	if err != nil {
+		return
+	}
+
+	ctx.LogDebug( "Wrote Control Messages")
+	// client should send proper response
+	msgs, err := conn.ReadControlMessages()
+
+	if err != nil {
+		return
+	}
+
+	ctx.LogDebug( "Handshake:", msgs)
+
+	return
+
 }

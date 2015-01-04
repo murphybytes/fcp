@@ -24,26 +24,59 @@ func ( c *Client ) Execute( ) {
 	if err != nil {
 		c.ctx.LogFatal( err )
 	}
-	
+
 	destService := c.GetService( dest )
-	var clientConnection *tufer.Client
-	clientConnection, err = tufer.NewClient(destService )
+
+	client, err := tufer.NewClient(destService, c.ctx )
 
 	if err != nil {
 		c.ctx.LogFatal( err )
 	}
 
-	_, err = clientConnection.Connect()
+	//var connection *tufer.Connection
+	connection, err := client.Connect()
 
 	if err != nil {
 		c.ctx.LogFatal( err )
 	}
 
-	c.ctx.LogDebug( "Connection from to ", destService, " succeeds" )
+	defer connection.Close()
+
+	c.ctx.LogDebug( "Connection to ", destService, " succeeds" )
+
+  err = c.Handshake( connection )
+
+	if err != nil {
+		c.ctx.LogFatal( err )
+	}
+
+	c.ctx.LogDebug( "Handshake succeeds")
+
+}
+
+
+
+
+func (c *Client) Handshake(conn *tufer.Connection)( err error) {
+	msgs, err := conn.ReadControlMessages()
+
+	if err != nil {
+		return
+	}
+
+	v := NewFatalValidator( c.ctx )
+	
+	v.ValidateInt( len(msgs), 2 )
+	v.ValidateString( msgs[0], INITIAL_SERVER_ID )
+
+
+	c.ctx.LogInfo( "Handshake:", msgs )
+
+	err = conn.WriteControlMessages( INITIAL_CLIENT_ID, CLIENT_CONTROL_PROTOCOL_VERSION )
+
+	return
 }
 
 func (c *Client) GetService( fileInfo *FileInformation )( string ) {
 	return fmt.Sprintf( "%s:%d", fileInfo.hostName, *c.ctx.arguments.port )
 }
-
-

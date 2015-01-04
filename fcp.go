@@ -9,7 +9,7 @@ import (
 
 
 func main() {
-	
+
 	ctx := NewContext()
 	flag.Parse()
 
@@ -21,17 +21,16 @@ func main() {
 
 		ctx.LogInfo("Starting in server mode.")
 		// fire up in server mode
-		inChan    := make(chan bool, 1 )
-		replyChan := make(chan bool, 1 )
+		serverChannel    := make(chan int )
 
-		go server( inChan, replyChan, ctx )
+		go RunServer( serverChannel,  ctx )
 
 		sig := <-signalChannel
 		ctx.LogDebug("Got signal: ", sig )
 		// signal server goroutine to shut down
-		inChan<- true
+		serverChannel<- 1
 		// block until it stops
-		<-replyChan
+		<-serverChannel
 		// get rid of pid file if one was created
 		ctx.RemovePidFile()
 		ctx.LogInfo("Server stopped, exiting...")
@@ -40,22 +39,22 @@ func main() {
 	} else {
 		// if we are here we are in interactive mode, look for file source and
 		// destination as last two arguments
-		ctx.arguments.fileArgs = flag.Args() 
-	
+		ctx.arguments.fileArgs = flag.Args()
+
 		if len(ctx.arguments.fileArgs) != 2 {
 			flag.Usage()
 			os.Exit( ERROR_IMPROPER_USAGE )
 		}
 
 		client, err := NewClient( ctx )
-		
+
 		if err != nil {
 			ctx.LogFatal( "Client shut down with error:", err )
 		}
 
 		client.Execute()
 
-		
+
 	}
 
 

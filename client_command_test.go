@@ -34,23 +34,23 @@ func TestParse( t *testing.T ) {
 	context.arguments.fileArgs[1] = "abc@foo.com:/dest/file"
 
 	source, dest, err = parser.Parse()
-	
+
 	if err != nil {
 		t.Error( "Expected nil error, got", err )
 	}
 
 	if source.fileName != "sourcefile" {
-		t.Error( `File field expected 'sourcefile' got`, source.fileName ) 
+		t.Error( `File field expected 'sourcefile' got`, source.fileName )
 	}
 
-	if dest.userName == "abc" && dest.hostName == "foo.com" && 
+	if dest.userName == "abc" && dest.hostName == "foo.com" &&
 		dest.fileName == "/dest/file" && err == nil {
 		t.Log( "Parse command successfully return dest", dest )
 	} else {
 		t.Error( "Parse command failed unexpected dest", dest )
 	}
 
-	
+
 
 }
 
@@ -67,7 +67,7 @@ func TestParseFileInformation( t *testing.T ) {
 	}
 
 	t.Log( "Parse user name" )
-	
+
 	if info.userName != "foo" {
 		t.Error( "Expected 'foo' got:", info.userName )
 	}
@@ -79,20 +79,20 @@ func TestParseFileInformation( t *testing.T ) {
 	if info.fileName != "/home/baz" {
 		t.Error("Expected filename /home/baz, got", info.fileName)
 	}
-	
+
 	commandPart = "bar.com:/home/baz"
-	
+
 	t.Log( "Test with a missing user name" )
 
 	info, _ = parser.ParseFileInformation( commandPart )
 	expected, _ := user.Current()
-	
+
 	if info.userName != expected.Username {
 		t.Error( "Expected", expected.Username, " got ", info.userName )
 	}
 
 	t.Log("Test with missing host name")
-	
+
 	commandPart = "/home/baz"
 	info, _ = parser.ParseFileInformation( commandPart )
 	expectedHost, _ := os.Hostname()
@@ -107,7 +107,7 @@ func TestParseFileInformation( t *testing.T ) {
 		t.Error( "Expected", commandPart, " got ", info.fileName )
 	}
 
-	commandPart = "foo@bar.com" 
+	commandPart = "foo@bar.com"
 	_, err := parser.ParseFileInformation( commandPart )
 	if err == nil {
 		t.Error( "Missing expected error" )
@@ -117,6 +117,6 @@ func TestParseFileInformation( t *testing.T ) {
 		}
 	}
 
-	
-	
+
+
 }
