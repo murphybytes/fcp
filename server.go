@@ -89,6 +89,17 @@ func Handshake(conn *tufer.Connection, ctx *Context)( err error ) {
 
 	ctx.LogDebug( "Handshake:", msgs)
 
+	validator := NewValidator()
+	err = validator.ValidateInt( 2, len( msgs ) )
+	if err != nil {
+		return
+	}
+	validator.ValidateString( INITIAL_CLIENT_ID, msgs[0] )
+	if err != nil {
+		return
+	}
+	
+
 	return
 
 }
